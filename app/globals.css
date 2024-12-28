@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 15%;  /* Dark background with black tones */
+    --foreground: 0 0% 90%;  /* Light text for contrast */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 250 40% 40%;  /* Lavender for primary */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 270 60% 40%;  /* Violet for secondary */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 250 10% 50%;  /* Muted lavender gray */
+    --muted-foreground: 0 0% 70%;
+    --accent: 250 50% 55%;  /* Bright lavender accent */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 80% 60%;  /* Red for destructive */
+    --destructive-foreground: 0 0% 98%;
+    --border: 250 30% 25%;  /* Lavender-tinted borders */
+    --input: 250 30% 30%;
+    --ring: 250 60% 40%;  /* Slightly deeper lavender for rings */
+    --radius: 0.5rem;
+    --hover-accent: 250 50% 45%;  /* Darker lavender for hover */
+    --hover-accent-foreground: 0 0% 100%;
+
+    /* Additional accent colors */
+    --success: 150 70% 50%;  /* Green for success (not lavender) */
+    --success-foreground: 150 70% 90%;
+    --info: 240 80% 60%;  /* Violet for info */
+    --info-foreground: 240 80% 95%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 95%;
+  }
+
+  .dark {
+    --background: 0 0% 10%;  /* Even darker background for dark mode */
+    --foreground: 0 0% 90%;
+    --card: 0 0% 15%;
+    --card-foreground: 0 0% 90%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 90%;
+    --primary: 250 40% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 270 60% 40%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 250 10% 40%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 250 50% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 250 30% 15%;
+    --input: 250 30% 20%;
+    --ring: 250 60% 50%;
+    --hover-accent: 250 50% 40%;
+    --hover-accent-foreground: 0 0% 100%;
+
+    /* Dark mode subtle accent colors */
+    --success: 150 70% 40%;
+    --success-foreground: 150 70% 90%;
+    --info: 240 80% 50%;
+    --info-foreground: 240 80% 95%;
+    --warning: 38 92% 45%;
+    --warning-foreground: 38 92% 95%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Enhanced Hover States */
+a:hover,
+button:hover,
+.text-link:hover {
+  background-color: hsl(var(--hover-accent));
+  color: hsl(var(--hover-accent-foreground));
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Enhanced Button and Link Styles */
+button,
+a {
+  color: hsl(var(--accent-foreground));
+  background-color: hsl(var(--accent));
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+}
+
+/* Subtle hover effect for icons */
+.icon {
+  transition: all 0.2s ease-in-out;
+}
+
+.icon:hover {
+  color: hsl(var(--hover-accent));
+  transform: scale(1.05);
+}
+
+/* New utility classes for subtle backgrounds */
+.bg-subtle-success {
+  background-color: hsl(var(--success) / 0.1);
+}
+
+.bg-subtle-info {
+  background-color: hsl(var(--info) / 0.1);
+}
+
+.bg-subtle-warning {
+  background-color: hsl(var(--warning) / 0.1);
+}
