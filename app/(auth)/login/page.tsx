@@ -22,7 +22,7 @@ export default function LoginPage() {
 
     try {
       await signIn(email, password);
-      router.push("/");
+      router.push("/"); 
     } catch (error) {
       toast({
         title: "Error",

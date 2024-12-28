@@ -22,7 +22,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await signUp(email, password, name);
+      await signUp(email, password, name);  // Register the user in Supabase and the DB
       toast({
         title: "Success",
         description: "Registration successful. Please check your email.",
