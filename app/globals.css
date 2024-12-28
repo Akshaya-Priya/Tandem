@@ -123,3 +123,49 @@ a {
 .bg-subtle-warning {
   background-color: hsl(var(--warning) / 0.1);
 }
+
+/* Enhanced Hover States for Links */
+a:hover,
+button:hover,
+.text-link:hover {
+  color: hsl(var(--hover-accent-foreground));
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Enhanced Button and Link Styles */
+button,
+a {
+  color: hsl(var(--accent-foreground));
+  background-color: transparent; /* Remove background for links */
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+}
+
+@layer base {
+  :root {
+    /* Add a light lavender accent background color for navbar icons */
+    --icon-bg: 250 50% 85%;  /* Light lavender background */
+  }
+
+  .dark {
+    --icon-bg: 250 50% 30%;  /* Darker lavender background for dark mode */
+  }
+}
+
+/* Navbar icon styles */
+.navbar-icon {
+  background-color: hsl(var(--icon-bg)); /* Use the light lavender background */
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.navbar-icon:hover {
+  background-color: hsl(var(--hover-accent)); /* Change to hover accent color on hover */
+  transform: scale(1.05); /* Slight zoom effect */
+}

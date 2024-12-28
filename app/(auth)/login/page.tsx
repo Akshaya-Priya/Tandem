@@ -69,12 +69,18 @@ export default function LoginPage() {
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            <Link href="/register" className="text-primary hover:underline">
+            <Link 
+              href="/register" 
+              className="text-foreground hover:text-accent transition-colors duration-200"
+            >
               Don't have an account? Sign up
             </Link>
           </div>
           <div className="mt-2 text-center text-sm">
-            <Link href="/reset-password" className="text-primary hover:underline">
+            <Link 
+              href="/reset-password" 
+              className="text-foreground hover:text-accent transition-colors duration-200"
+            >
               Forgot password?
             </Link>
           </div>
