@@ -1,5 +1,7 @@
 # Tandem - Volunteer Management System 🚀
 
+![image](https://github.com/user-attachments/assets/45edfc1f-068c-490a-a39a-2da8e4bd3e71)
+
 A full-stack web application for managing volunteers, events, and tasks for community-driven projects. The platform enables organizers to manage events, assign tasks to volunteers, and collect feedback on events. Volunteers can sign up, participate in events, and submit feedback.
 
 ## Features 🌟
@@ -26,10 +28,7 @@ A full-stack web application for managing volunteers, events, and tasks for comm
 - PostgreSQL database (handled by Supabase)
 - Vercel account (for deploying the frontend)
 
-## Getting Started 🏁
-
-![Project image](https://github.com/user-attachments/assets/00558235-1bc9-4869-ad03-a6bb9c7b2b9a)
-
+## Project Snapshots 🏁
 ![users](https://github.com/user-attachments/assets/502e6fcf-4941-4cf0-95da-402a649be156)
 
 ![image](https://github.com/user-attachments/assets/3ff84c08-64c3-4a4d-a163-bca20cb34862)
