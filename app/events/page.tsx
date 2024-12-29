@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Event } from "@/lib/types";
 import { supabase } from "@/lib/auth";
 import {
   Table,
@@ -15,17 +14,19 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<any[]>([]);  
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchEvents() {
       const { data, error } = await supabase
         .from("events")
-        .select("*")
-        .order("date", { ascending: true });
+        .select(`id, name, description, date, location, status, created_at, organizer_id (name)`)
+        .order("created_at", { ascending: true });
 
-      if (!error && data) {
+      if (error) {
+        console.error("Error fetching events:", error);
+      } else if (data) {
         setEvents(data);
       }
       setLoading(false);
@@ -48,24 +49,28 @@ export default function EventsPage() {
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
+            <TableHead>Description</TableHead>
             <TableHead>Date</TableHead>
-            <TableHead>Time</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Organizer</TableHead>
+            <TableHead>Created At</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {events.map((event) => (
             <TableRow key={event.id}>
               <TableCell>{event.name}</TableCell>
+              <TableCell>{event.description || "N/A"}</TableCell>
               <TableCell>{format(new Date(event.date), "PPP")}</TableCell>
-              <TableCell>{event.time}</TableCell>
-              <TableCell>{event.location}</TableCell>
+              <TableCell>{event.location || "N/A"}</TableCell>
               <TableCell>
-                <Badge variant={event.status === "active" ? "default" : "secondary"}>
+                <Badge variant={event.status === "Completed" ? "default" : "secondary"}>
                   {event.status}
                 </Badge>
               </TableCell>
+              <TableCell>{event.organizer_id?.name || "N/A"}</TableCell>
+              <TableCell>{format(new Date(event.created_at), "PPP")}</TableCell>
             </TableRow>
           ))}
         </TableBody>

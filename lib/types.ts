@@ -37,11 +37,15 @@ export type VolunteerParticipation = {
 
 export type Task = {
   id: string;
-  event_id: string;
   description: string;
-  assigned_to: string | null;
-  status: 'pending' | 'complete';
+  status: "pending" | "complete";
   created_at: string;
+  event?: {
+    name: string;
+  };
+  user?: {
+    name: string;
+  };
 };
 
 export type Feedback = {

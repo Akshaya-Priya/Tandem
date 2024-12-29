@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
 
 interface Event {
   id: string;
@@ -27,8 +28,10 @@ interface Event {
 interface Task {
   id: string;
   description: string;
-  eventId: string;
-  assignedTo: string;
+  event_id: string;
+  assigned_to: string;
+  status: string;
+  created_at: string;
 }
 
 interface LocalUser {
@@ -38,9 +41,10 @@ interface LocalUser {
 
 export default function OrganizersPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [isOrganizer, setIsOrganizer] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]); // Added state for tasks
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [eventDetails, setEventDetails] = useState({
     name: "",
     description: "",
@@ -55,7 +59,6 @@ export default function OrganizersPage() {
   const [users, setUsers] = useState<LocalUser[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Check if user is an organizer
   useEffect(() => {
     async function checkRole() {
       const { data, error } = await supabase.auth.getSession();
@@ -78,7 +81,6 @@ export default function OrganizersPage() {
     checkRole();
   }, [router]);
 
-  // Fetch events and users
   useEffect(() => {
     async function fetchData() {
       if (!isOrganizer) return;
@@ -92,45 +94,84 @@ export default function OrganizersPage() {
         .from("users")
         .select("id, name");
 
-      setEvents(eventsData as Event[] || []);
-      setUsers(usersData as LocalUser[] || []);
+      const { data: tasksData } = await supabase
+        .from("tasks")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      setEvents(eventsData || []);
+      setUsers(usersData || []);
+      setTasks(tasksData || []);
     }
 
     fetchData();
   }, [isOrganizer]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (!isOrganizer) return <div>You are not an organizer.</div>;
 
-  if (!isOrganizer) {
-    return <div>You are not an organizer.</div>;
-  }
-
-  // Add event
   async function handleAddEvent() {
     const { error } = await supabase.from("events").insert([eventDetails]);
-    if (!error) {
-      setEventDetails({ name: "", description: "", date: "", location: "" });
-      const { data: updatedEvents } = await supabase
-        .from("events")
-        .select("*")
-        .order("created_at", { ascending: false });
-      setEvents(updatedEvents as Event[] || []);
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add event. Please check your input.",
+        variant: "destructive",
+      });
+      return;
     }
+
+    toast({
+      title: "Success",
+      description: "Event added successfully!",
+    });
+
+    const { data: updatedEvents } = await supabase
+      .from("events")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    setEvents(updatedEvents || []);
+    setEventDetails({ name: "", description: "", date: "", location: "" });
   }
 
-  // Assign task
   async function handleAssignTask() {
-    const { error } = await supabase.from("tasks").insert([taskDetails]);
-    if (!error) {
-      setTaskDetails({ description: "", eventId: "", assignedTo: "" });
-      const { data: updatedTasks } = await supabase
-        .from("tasks")
-        .select("*")
-        .order("created_at", { ascending: false });
-      setTasks(updatedTasks as Task[] || []);
+    if (!taskDetails.description || !taskDetails.eventId || !taskDetails.assignedTo) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields before assigning a task.",
+        variant: "destructive",
+      });
+      return;
     }
+
+    const { error } = await supabase.from("tasks").insert({
+      description: taskDetails.description,
+      event_id: taskDetails.eventId,
+      assigned_to: taskDetails.assignedTo,
+    });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to assign the task. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "Task assigned successfully!",
+    });
+
+    const { data: updatedTasks } = await supabase
+      .from("tasks")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    setTasks(updatedTasks || []);
+    setTaskDetails({ description: "", eventId: "", assignedTo: "" });
   }
 
   return (
@@ -147,7 +188,6 @@ export default function OrganizersPage() {
             onChange={(e) =>
               setEventDetails({ ...eventDetails, name: e.target.value })
             }
-            className="border-gray-300"
           />
           <Input
             placeholder="Description"
@@ -155,7 +195,6 @@ export default function OrganizersPage() {
             onChange={(e) =>
               setEventDetails({ ...eventDetails, description: e.target.value })
             }
-            className="border-gray-300"
           />
           <Input
             type="date"
@@ -163,7 +202,6 @@ export default function OrganizersPage() {
             onChange={(e) =>
               setEventDetails({ ...eventDetails, date: e.target.value })
             }
-            className="border-gray-300"
           />
           <Input
             placeholder="Location"
@@ -171,59 +209,87 @@ export default function OrganizersPage() {
             onChange={(e) =>
               setEventDetails({ ...eventDetails, location: e.target.value })
             }
-            className="border-gray-300"
           />
-          <Button onClick={handleAddEvent} className="w-full bg-primary hover:bg-primary-dark text-white">
-            Add Event
-          </Button>
+          <Button onClick={handleAddEvent}>Add Event</Button>
         </div>
       </div>
 
-      {/* Assign Task Section */}
-      <div className="space-y-6 bg-card p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold">Assign Task</h2>
-        <div className="space-y-4">
-          <Input
-            placeholder="Task Description"
-            value={taskDetails.description}
-            onChange={(e) =>
-              setTaskDetails({ ...taskDetails, description: e.target.value })
-            }
-            className="border-gray-300"
-          />
-          <select
-            className="block w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            value={taskDetails.eventId}
-            onChange={(e) =>
-              setTaskDetails({ ...taskDetails, eventId: e.target.value })
-            }
-          >
-            <option value="">Select Event</option>
-            {events.map((event) => (
-              <option key={event.id} value={event.id}>
-                {event.name}
-              </option>
-            ))}
-          </select>
-          <select
-            className="block w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            value={taskDetails.assignedTo}
-            onChange={(e) =>
-              setTaskDetails({ ...taskDetails, assignedTo: e.target.value })
-            }
-          >
-            <option value="">Assign to User</option>
-            {users.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.name}
-              </option>
-            ))}
-          </select>
-          <Button onClick={handleAssignTask} className="w-full bg-primary hover:bg-primary-dark text-white">
-            Assign Task
-          </Button>
-        </div>
+{/* Assign Task Section */}
+<div className="space-y-6 bg-card p-6 rounded-lg shadow-lg">
+  <h2 className="text-2xl font-semibold text-primary">Assign Task</h2>
+  <div className="space-y-4">
+    {/* Task Description */}
+    <div className="flex flex-col space-y-1">
+      <label htmlFor="taskDescription" className="text-sm font-medium text-muted">
+        Task Description
+      </label>
+      <Input
+        id="taskDescription"
+        placeholder="Enter task description"
+        value={taskDetails.description}
+        onChange={(e) =>
+          setTaskDetails({ ...taskDetails, description: e.target.value })
+        }
+      />
+    </div>
+
+    {/* Event Selection */}
+    <div className="flex flex-col space-y-1">
+      <label htmlFor="eventSelect" className="text-sm font-medium text-muted">
+        Select Event
+      </label>
+      <select
+        id="eventSelect"
+        className="rounded-md border border-input bg-background px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
+        value={taskDetails.eventId}
+        onChange={(e) =>
+          setTaskDetails({ ...taskDetails, eventId: e.target.value })
+        }
+      >
+        <option value="" disabled>
+          Select Event
+        </option>
+        {events.map((event) => (
+          <option key={event.id} value={event.id}>
+            {event.name}
+          </option>
+        ))}
+      </select>
+    </div>
+
+      {/* User Assignment */}
+      <div className="flex flex-col space-y-1">
+        <label htmlFor="userSelect" className="text-sm font-medium text-muted">
+          Assign to User
+        </label>
+        <select
+          id="userSelect"
+          className="rounded-md border border-input bg-background px-4 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
+          value={taskDetails.assignedTo}
+          onChange={(e) =>
+            setTaskDetails({ ...taskDetails, assignedTo: e.target.value })
+          }
+        >
+          <option value="" disabled>
+            Select User
+          </option>
+          {users.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.name}
+            </option>
+          ))}
+        </select>
       </div>
+
+      {/* Assign Task Button */}
+      <div className="flex justify-front">
+        <Button onClick={handleAssignTask} className="w-full md:w-auto">
+          Assign Task
+        </Button>
+      </div>
+    </div>
+  </div>
+
     </div>
   );
 }
