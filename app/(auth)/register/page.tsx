@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("volunteer"); // Default role
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
@@ -22,7 +23,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await signUp(email, password, name);  // Register the user in Supabase and the DB
+      await signUp(email, password, name, role); // Pass role to signUp function
       toast({
         title: "Success",
         description: "Registration successful. Please check your email.",
@@ -74,11 +75,18 @@ export default function RegisterPage() {
                 minLength={8}
               />
             </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading}
-            >
+            <div className="space-y-2">
+              <select
+                className="w-full p-2 border rounded"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                required
+              >
+                <option value="volunteer">Volunteer</option>
+                <option value="organizer">Organizer</option>
+              </select>
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Loading..." : "Sign Up"}
             </Button>
           </form>

@@ -7,12 +7,12 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // SignUp: Create user in Supabase auth and insert user data into a database table.
-export async function signUp(email: string, password: string, name: string) {
+export async function signUp(email: string, password: string, name: string, role: string) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      data: { name }
+      data: { name, role }
     }
   });
 
@@ -22,7 +22,7 @@ export async function signUp(email: string, password: string, name: string) {
   // Insert user into the database (users table) after successful sign-up
   const { error: insertError } = await supabase
     .from('users')
-    .insert([{ id: data.user.id, email, name }]);
+    .insert([{ id: data.user.id, email, name, role }]);
 
   if (insertError) throw insertError;
 

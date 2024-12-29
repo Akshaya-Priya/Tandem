@@ -9,20 +9,28 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  // Protected routes
   const protectedPaths = ['/users', '/events', '/tasks', '/participation', '/feedback'];
-  const isProtectedPath = protectedPaths.some(path => req.nextUrl.pathname.startsWith(path));
-
-  // Auth routes
   const authPaths = ['/login', '/register', '/reset-password'];
-  const isAuthPath = authPaths.some(path => req.nextUrl.pathname.startsWith(path));
 
+  const isProtectedPath = protectedPaths.some((path) => req.nextUrl.pathname.startsWith(path));
+  const isAuthPath = authPaths.some((path) => req.nextUrl.pathname.startsWith(path));
+
+  // Redirect unauthenticated users to the login page for protected paths
   if (isProtectedPath && !session) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
 
+  // Redirect authenticated users away from auth pages to the home page
   if (isAuthPath && session) {
     return NextResponse.redirect(new URL('/', req.url));
+  }
+
+  // Redirect unauthenticated users accessing the home page to the login page
+  if (req.nextUrl.pathname === '/' && !session) {
+    // Clear Supabase auth cookies
+    res.cookies.delete('sb-access-token');
+    res.cookies.delete('sb-refresh-token');
+    return NextResponse.redirect(new URL('/login', req.url));
   }
 
   return res;

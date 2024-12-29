@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signIn } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,17 +16,78 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
 
+  useEffect(() => {
+    // Listen for authentication state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        checkUserRoleAndRedirect(session.user.id);
+      }
+    });
+
+    return () => {
+      if (authListener) authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  // Check user role and redirect accordingly
+  async function checkUserRoleAndRedirect(userId: string) {
+    try {
+      const { data: userData, error } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", userId)
+        .single();
+
+      if (error || !userData) {
+        throw new Error("Unable to fetch user role.");
+      }
+
+      // Redirect based on user role
+      switch (userData.role) {
+        case "organizer":
+          router.push("/organizers");
+          break;
+        case "volunteer":
+          router.push("/volunteers");
+          break;
+        case "admin":
+          router.push("/admin");
+          break;
+        default:
+          router.push("/");
+          break;
+      }
+    } catch (error) {
+      console.error("Error fetching user role:", error);
+      toast({
+        title: "Error",
+        description: "Unable to determine user role.",
+        variant: "destructive",
+      });
+    }
+  }
+
+  // Handle form submission
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
 
     try {
-      await signIn(email, password);
-      router.push("/"); 
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        throw new Error("Invalid email or password.");
+      }
+
+      // If login is successful, check user role and redirect
+      if (data.user) {
+        await checkUserRoleAndRedirect(data.user.id);
+      }
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         title: "Error",
-        description: "Invalid email or password",
+        description: error instanceof Error ? error.message : "An error occurred.",
         variant: "destructive",
       });
     } finally {
@@ -69,16 +130,16 @@ export default function LoginPage() {
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            <Link 
-              href="/register" 
+            <Link
+              href="/register"
               className="text-foreground hover:text-accent transition-colors duration-200"
             >
               Don't have an account? Sign up
             </Link>
           </div>
           <div className="mt-2 text-center text-sm">
-            <Link 
-              href="/reset-password" 
+            <Link
+              href="/reset-password"
               className="text-foreground hover:text-accent transition-colors duration-200"
             >
               Forgot password?
