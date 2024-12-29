@@ -1,8 +1,8 @@
-# Tandem - Volunteer Management System
+# Tandem - Volunteer Management System 🚀
 
 A full-stack web application for managing volunteers, events, and tasks for community-driven projects. The platform enables organizers to manage events, assign tasks to volunteers, and collect feedback on events. Volunteers can sign up, participate in events, and submit feedback.
 
-## Features
+## Features 🌟
 
 - **Organizer Dashboard**: Manage events, assign tasks, and track volunteer participation.
 - **Volunteer Participation**: View available events and sign up for participation.
@@ -11,7 +11,7 @@ A full-stack web application for managing volunteers, events, and tasks for comm
 - **Authentication**: Secure login and registration using Supabase.
 - **Role-Based Access Control**: Different levels of access for organizers, volunteers, and admins.
 
-## Tech Stack
+## Tech Stack 🛠️
 
 - **Frontend**: Next.js (Tailwind CSS for styling)
 - **Backend**: Supabase (PostgreSQL, and Authentication)
@@ -19,21 +19,26 @@ A full-stack web application for managing volunteers, events, and tasks for comm
 - **Authentication**: Supabase Auth
 - **Deployment**: Vercel (in the future) and Supabase (for backend)
 
-## Prerequisites
+## Prerequisites 📋
 
 - Node.js (v18 or higher)
 - Supabase account (for database and authentication)
 - PostgreSQL database (handled by Supabase)
 - Vercel account (for deploying the frontend)
 
-## Getting Started
+## Getting Started 🏁
+
+![Project image](https://github.com/user-attachments/assets/00558235-1bc9-4869-ad03-a6bb9c7b2b9a)
+
+![users](https://github.com/user-attachments/assets/502e6fcf-4941-4cf0-95da-402a649be156)
+
+![image](https://github.com/user-attachments/assets/3ff84c08-64c3-4a4d-a163-bca20cb34862)
 
 ### Clone the Repository
 
 ```bash
 git clone https://github.com/himanshukt03/Tandem.git
 cd Tandem
-```
 
 ### Install Dependencies
 
