@@ -23,6 +23,7 @@ export type Event = {
   location: string;
   status: 'active' | 'completed';
   organizer_id: string;
+  time: string;
   created_at: string;
 };
 
