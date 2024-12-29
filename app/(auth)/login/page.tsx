@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase"; // Ensure supabase is initialized here
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +17,15 @@ export default function LoginPage() {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Check if the user is already logged in and redirect if so
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        checkUserRoleAndRedirect(session.user.id);
+      }
+    };
+    checkSession();
+
     // Listen for authentication state changes
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
@@ -48,7 +57,7 @@ export default function LoginPage() {
           router.push("/organizers");
           break;
         case "volunteer":
-          router.push("/volunteers");
+          router.push("/");
           break;
         case "admin":
           router.push("/admin");
