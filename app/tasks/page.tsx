@@ -17,9 +17,11 @@ import { format } from "date-fns";
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null); // Added error state for better handling
 
   useEffect(() => {
     async function fetchTasks() {
+      try {
         const { data, error } = await supabase
           .from("tasks")
           .select(`
@@ -27,30 +29,39 @@ export default function TasksPage() {
             description,
             status,
             created_at,
-            event (name),
-            user (name)
+            event: events!inner(
+              name
+            ),
+            user: users!inner(
+              name
+            )
           `)
           .order("created_at", { ascending: true });
-      
+
         if (error) {
-          console.error("Error fetching tasks:", error);
-        } else if (data) {
-          console.log("Fetched data:", data); // Log the response to check data
-          const formattedTasks = data.map((task: any) => ({
-            ...task,
-            event: task.event ? task.event[0] : undefined,
-            user: task.user ? task.user[0] : undefined,
-          }));
-          setTasks(formattedTasks);
+          throw error; // Throw error if something goes wrong
         }
+
+        console.log("Fetched data:", data); // Log the fetched data to inspect
+
+        setTasks(data); 
+      } catch (error: any) {
+        console.error("Error fetching tasks:", error);
+        setError("There was an error fetching tasks. Please try again later.");
+      } finally {
         setLoading(false);
       }
+    }
 
     fetchTasks();
   }, []);
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
   }
 
   return (
